@@ -12,7 +12,7 @@ pipeline {
         EN_IMAGE_NAME = "${DOCKERHUB_USERNAME}/${EN_DEPLOYMENT_NAME}:${IMAGE_TAG}"
         NAMESPACE = 'gassikialaw'
         BRANCH_NAME = "${GIT_BRANCH.split('/')[1]}"
-        SMTP_SERVER_PASS = credentials('1be23fe9-d2cf-48d5-a5b8-c1b1f9ea6bca')
+        SMTP_SERVER_PASS = credentials('2c133af2-e9eb-4073-b032-00ddcd7366a4')
         PORT = '465'
         SMTP_SERVER = 'smtp.sendgrid.net'
         EMAIL = 'apikey'
