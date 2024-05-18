@@ -77,22 +77,30 @@ pipeline {
         stage("Docker Build") {
             steps {
                 script {
-                    sh "docker build -t $IMAGE_NAME --build-arg EMAIL=$EMAIL --build-arg SMTP_SERVER=$SMTP_SERVER --build-arg PORT=$PORT --build-arg SMTP_SERVER_PASS=$SMTP_SERVER_PASS ."
+                  dir('./gassikialaw'){
+                    sh "docker build -t $EN_IMAGE_NAME --build-arg EMAIL=$EMAIL --build-arg SMTP_SERVER=$SMTP_SERVER --build-arg PORT=$PORT --build-arg SMTP_SERVER_PASS=$SMTP_SERVER_PASS ."
                     echo "Image built successful"
+                  }
+                  dir('./fr_gassikialaw') {
+                    sh "docker build -t $FR_IMAGE_NAME --build-arg EMAIL=$EMAIL --build-arg SMTP_SERVER=$SMTP_SERVER --build-arg PORT=$PORT --build-arg SMTP_SERVER_PASS=$SMTP_SERVER_PASS ."
+                    echo "Image built successful"
+                  }
                 }
             }
         }
         stage("Trivy Image Scan") {
             steps {
                 script {
-                    sh "trivy image $IMAGE_NAME"
+                    sh "trivy image $EN_IMAGE_NAME"
+                    sh "trivy image $FR_IMAGE_NAME"
                 }
             }
         }
         stage("Docker Push") {
             steps {
                 script {
-                    sh "docker push $IMAGE_NAME"
+                    sh "docker push $EN_IMAGE_NAME"
+                    sh "docker push $FR_IMAGE_NAME"
                 }
             }
         }
