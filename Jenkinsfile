@@ -108,14 +108,7 @@ pipeline {
             steps {
                 script {
                     dir('./k8s') {
-                        withKubeCredentials(
-                            caCertificate: '',
-                            clusterName: '',
-                            contextName: '',
-                            credentialsId: 'fff8a37d-0976-4787-a985-a82f34d8db40',
-                            namespace: '',
-                            serverUrl: ''
-                        ) {
+                        withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'fff8a37d-0976-4787-a985-a82f34d8db40', namespace: '', serverUrl: '']]) {
                             try {
                                 // Replace placeholders in deployment YAML files
                                 sh "sed -i 's|IMAGE_NAME|${env.EN_IMAGE_NAME}|g' en/deployment.yaml"
