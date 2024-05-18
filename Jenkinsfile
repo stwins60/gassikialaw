@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('d4506f04-b98c-47db-95ce-018ceac27ba6')
+        DOCKERHUB_CREDENTIALS = credentials('1686a704-e66e-40f8-ac04-771a33b6256d')
         SCANNER_HOME= tool 'sonar-scanner'
         DOCKERHUB_USERNAME = 'idrisniyi94'
-        FR_DEPLOYMENT_NAME = 'fr-gassikialaw'
-        EN_DEPLOYMENT_NAME = 'en-gassikialaw'
+        FR_DEPLOYMENT_NAME = 'gassikialaw-fr'
+        EN_DEPLOYMENT_NAME = 'gassikialaw-en'
         IMAGE_TAG = "v.0.${env.BUILD_NUMBER}"
         FR_IMAGE_NAME = "${DOCKERHUB_USERNAME}/${FR_DEPLOYMENT_NAME}:${IMAGE_TAG}"
-        EN_IMAGE_NAME = "${DOCKERHUB_USERNAME}/${FEN_DEPLOYMENT_NAME}:${IMAGE_TAG}"
+        EN_IMAGE_NAME = "${DOCKERHUB_USERNAME}/${EN_DEPLOYMENT_NAME}:${IMAGE_TAG}"
         NAMESPACE = 'gassikialaw'
         BRANCH_NAME = "${GIT_BRANCH.split('/')[1]}"
         SMTP_SERVER_PASS = credentials('1be23fe9-d2cf-48d5-a5b8-c1b1f9ea6bca')
@@ -26,7 +26,7 @@ pipeline {
         }
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/stwins60/NIA_NAMECHEAP.git'
+                git branch: 'master', url: 'https://github.com/stwins60/gassikialaw.git'
             }
         }
         stage('Sonarqube Analysis') {
@@ -100,20 +100,50 @@ pipeline {
             steps {
                 script {
                     dir('./k8s') {
-                        kubeconfig(credentialsId: '500a0599-809f-4de0-a060-0fdbb6583332', serverUrl: '') {
-                            sh "sed -i 's|IMAGE_NAME|${env.IMAGE_NAME}|g' deployment.yaml"
-                            sh "kubectl apply -f deployment.yaml"
-                            sh "kubectl apply -f service.yaml"
-                            slackSend channel: '#alerts', color: 'good', message: "Deployment to Kubernetes was successful and currently running on https://nigeriaislamicassociation.org/"
-                        }
-                        def rolloutStatus = sh(script: 'kubectl rollout status deploy $DEPLOYMENT_NAME -n $NAMESPACE', returnStatus: true)
-                        if (rolloutStatus != 0) {
-                            slackSend channel: '#alerts', color: 'danger', message: "Deployment to Kubernetes failed"
+                        withKubeCredentials(
+                            caCertificate: '',
+                            clusterName: '',
+                            contextName: '',
+                            credentialsId: 'fff8a37d-0976-4787-a985-a82f34d8db40',
+                            namespace: '',
+                            serverUrl: ''
+                        ) {
+                            try {
+                                // Replace placeholders in deployment YAML files
+                                sh "sed -i 's|IMAGE_NAME|${env.EN_IMAGE_NAME}|g' en/deployment.yaml"
+                                sh "sed -i 's|IMAGE_NAME|${env.FR_IMAGE_NAME}|g' fr/deployment.yaml"
+
+                                // Apply Kubernetes configurations
+                                sh "kubectl apply -f fr/ -f en/"
+
+                                // Send success messages to Slack
+                                slackSend channel: '#alerts', color: 'good', message: "FR Deployment to Kubernetes was successful and currently running on https://fr.gassikialaw.com/"
+                                slackSend channel: '#alerts', color: 'good', message: "EN Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/"
+                                
+                                // Check rollout status for both deployments
+                                def frRolloutStatus = sh(script: 'kubectl rollout status deploy/fr-deployment -n fr-namespace', returnStatus: true)
+                                def enRolloutStatus = sh(script: 'kubectl rollout status deploy/en-deployment -n en-namespace', returnStatus: true)
+
+                                // Handle rollout statuses
+                                if (frRolloutStatus != 0) {
+                                    slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw French site Deployment to Kubernetes failed"
+                                }
+                                if (enRolloutStatus != 0) {
+                                    slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw English site Deployment to Kubernetes failed"
+                                }
+
+                            } catch (Exception e) {
+                                // Send failure message to Slack in case of any exception
+                                slackSend channel: '#alerts', color: 'danger', message: "Deployment to Kubernetes failed with exception: ${e.message}"
+                                // Rethrow the exception to fail the build
+                                throw e
                             }
+                        }
                     }
                 }
             }
         }
+
     }
     post {
         success {

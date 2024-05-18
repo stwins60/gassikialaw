@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gassikialaw-en-deployment
+  namespace: gassikialaw
+spec:
+  selector:
+    matchLabels:
+      app: gassikialaw-en
+  template:
+    metadata:
+      labels:
+        app: gassikialaw-en
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: custom-label
+                    operator: In
+                    values:
+                      - proxmox
+                      - k8s
+      containers:
+      - name: gassikialaw-en
+        image: idrisniyi94/en-gassikialaw
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5000
+        env:
+          - name: EMAIL
+            value: apikey
+          - name: PORT
+            value: "465"
+          - name: SERVER
+            value: smtp.sendgrid.net
+          - name:  SERVER_PASS
+            valueFrom:
+              secretKeyRef:
+                name:  smtp-password
+                key:  password
+            
