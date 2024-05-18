@@ -1,0 +1,14 @@
+/fr_gassikialaw/__pycache__
+/fr_gassikialaw/public
+/fr_gassikialaw/tmp
+/fr_gassikialaw/.env
+/fr_gassikialaw/passenger_wsgi.py
+/fr_gassikialaw/stderr.log
+/fr_gassikialaw/venv
+/gassikialaw/__pycache__
+/gassikialaw/public
+/gassikialaw/tmp
+/gassikialaw/.env
+/gassikialaw/passenger_wsgi.py
+/gassikialaw/stderr.log
+/gassikialaw/venv
