@@ -20,7 +20,6 @@ spec:
                   - key: custom-label
                     operator: In
                     values:
-                      - proxmox
                       - k8s
       containers:
       - name: gassikialaw-en

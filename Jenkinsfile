@@ -122,8 +122,8 @@ pipeline {
                                 slackSend channel: '#alerts', color: 'good', message: "EN Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/"
                                 
                                 // Check rollout status for both deployments
-                                def frRolloutStatus = sh(script: 'kubectl rollout status deploy/fr-deployment -n fr-namespace', returnStatus: true)
-                                def enRolloutStatus = sh(script: 'kubectl rollout status deploy/en-deployment -n en-namespace', returnStatus: true)
+                                def frRolloutStatus = sh(script: "kubectl rollout status $FR_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
+                                def enRolloutStatus = sh(script: "kubectl rollout status $EN_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
 
                                 // Handle rollout statuses
                                 if (frRolloutStatus != 0) {
