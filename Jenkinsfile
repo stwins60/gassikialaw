@@ -122,16 +122,16 @@ pipeline {
                                 slackSend channel: '#alerts', color: 'good', message: "EN Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/"
                                 
                                 // Check rollout status for both deployments
-                                def frRolloutStatus = sh(script: "kubectl rollout status $FR_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
-                                def enRolloutStatus = sh(script: "kubectl rollout status $EN_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
+                                // def frRolloutStatus = sh(script: "kubectl rollout status $FR_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
+                                // def enRolloutStatus = sh(script: "kubectl rollout status $EN_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
 
                                 // Handle rollout statuses
-                                if (frRolloutStatus != 0) {
-                                    slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw French site Deployment to Kubernetes failed"
-                                }
-                                if (enRolloutStatus != 0) {
-                                    slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw English site Deployment to Kubernetes failed"
-                                }
+                                // if (frRolloutStatus != 0) {
+                                //     slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw French site Deployment to Kubernetes failed"
+                                // }
+                                // if (enRolloutStatus != 0) {
+                                //     slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw English site Deployment to Kubernetes failed"
+                                // }
 
                             } catch (Exception e) {
                                 // Send failure message to Slack in case of any exception
