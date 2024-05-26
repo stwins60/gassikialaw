@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('5f8b634a-148a-4067-b996-07b4b3276fba')
-        NVDAPIKEY = credentials('ed62b912-6db4-4d3a-a445-a1799077253e')
+        DOCKERHUB_CREDENTIALS = credentials('1686a704-e66e-40f8-ac04-771a33b6256d')
         SCANNER_HOME= tool 'sonar-scanner'
         DOCKERHUB_USERNAME = 'idrisniyi94'
         FR_DEPLOYMENT_NAME = 'gassikialaw-fr'
@@ -13,7 +12,7 @@ pipeline {
         EN_IMAGE_NAME = "${DOCKERHUB_USERNAME}/${EN_DEPLOYMENT_NAME}:${IMAGE_TAG}"
         NAMESPACE = 'gassikialaw'
         BRANCH_NAME = "${GIT_BRANCH.split('/')[1]}"
-        SMTP_SERVER_PASS = credentials('679540cf-8098-405f-96d5-7d0106554cd6')
+        SMTP_SERVER_PASS = credentials('2c133af2-e9eb-4073-b032-00ddcd7366a4')
         PORT = '465'
         SMTP_SERVER = 'smtp.sendgrid.net'
         EMAIL = 'apikey'
@@ -58,7 +57,7 @@ pipeline {
         // }
         stage('OWASP') {
             steps {
-                dependencyCheck additionalArguments: "--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey ${env.NVDAPIKEY}", odcInstallation: 'DP-Check'
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey 4bdf4acc-8eae-45c1-bfc4-844d549be812', odcInstallation: 'DP-Check'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
@@ -109,7 +108,7 @@ pipeline {
             steps {
                 script {
                     dir('./k8s') {
-                        withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: '3f12ff7b-93cb-4ea5-bc21-79bcf5fb1925', namespace: '', serverUrl: '']]) {
+                        withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'fff8a37d-0976-4787-a985-a82f34d8db40', namespace: '', serverUrl: '']]) {
                             try {
                                 // Replace placeholders in deployment YAML files
                                 sh "sed -i 's|IMAGE_NAME|${env.EN_IMAGE_NAME}|g' en/deployment.yaml"
@@ -119,8 +118,20 @@ pipeline {
                                 sh "kubectl apply -f fr/ -f en/"
 
                                 // Send success messages to Slack
-                                slackSend channel: '#alerts', color: 'good', message: "English and French Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/ and https://fr.gassikialaw.com/ respectively"
+                                slackSend channel: '#alerts', color: 'good', message: "FR Deployment to Kubernetes was successful and currently running on https://fr.gassikialaw.com/"
+                                slackSend channel: '#alerts', color: 'good', message: "EN Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/"
+                                
+                                // Check rollout status for both deployments
+                                // def frRolloutStatus = sh(script: "kubectl rollout status $FR_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
+                                // def enRolloutStatus = sh(script: "kubectl rollout status $EN_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
 
+                                // Handle rollout statuses
+                                // if (frRolloutStatus != 0) {
+                                //     slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw French site Deployment to Kubernetes failed"
+                                // }
+                                // if (enRolloutStatus != 0) {
+                                //     slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw English site Deployment to Kubernetes failed"
+                                // }
 
                             } catch (Exception e) {
                                 // Send failure message to Slack in case of any exception
