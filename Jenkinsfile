@@ -117,8 +117,8 @@ pipeline {
                                 // Apply Kubernetes configurations
                                 sh "kubectl apply -f fr/ -f en/"
 
-                                sh "kubectl rollout restart deployment/$FR_DEPLOYMENT_NAME -n $NAMESPACE"
-                                sh "kubectl rollout restart deployment/$EN_DEPLOYMENT_NAME -n $NAMESPACE"
+                                sh "kubectl rollout restart deployment $FR_DEPLOYMENT_NAME-deployment -n $NAMESPACE"
+                                sh "kubectl rollout restart deployment $EN_DEPLOYMENT_NAME-deployment -n $NAMESPACE"
 
                                 // Send success messages to Slack
                                 slackSend channel: '#alerts', color: 'good', message: "FR Deployment to Kubernetes was successful and currently running on https://fr.gassikialaw.com/"
