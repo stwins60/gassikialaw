@@ -5,8 +5,6 @@ import random
 import sentry_sdk
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 from sentry_sdk.integrations.flask import FlaskIntegration
-from sentry_sdk.integrations.browser import BrowserTracingIntegration
-
 
 token = ''.join(random.sample('abcdefghijklmnopqrstuvwxyz0123456789', 24))
 
@@ -26,9 +24,6 @@ sentry_sdk.init(
     integrations = [
         FlaskIntegration(
             transaction_style="url"
-        ),
-        BrowserTracingIntegration(
-            enable_inp=True
         ),
         AioHttpIntegration(
             transaction_style="method_and_path_pattern"
