@@ -2,13 +2,28 @@ from flask import Flask, render_template, request, redirect, url_for, flash, mak
 from flask_cors import CORS
 import mailer
 import random
-
+from sentry_sdk.integrations.flask import FlaskIntegration
+import sentry_sdk
 
 token = ''.join(random.sample('abcdefghijklmnopqrstuvwxyz0123456789', 24))
 
 app = Flask(__name__)
 app.secret_key = token
 CORS(app)
+
+sentry_sdk.init(
+    dsn="https://7a8ff1273de0318966f247225d3bad22@sentry.africantech.dev/3",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    enable_tracing=True,
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+    integrations = [
+        FlaskIntegration(
+            transaction_style="url"
+        )
+    ]
+)
 
 headers = {
     'Content-Type': 'text/html',
