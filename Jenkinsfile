@@ -70,21 +70,32 @@ pipeline {
         stage('Change Page URL for French') {
             steps {
                 script {
-                    dir('./templates') {
-                        if (env.BRANCH_NAME == 'dev') {
-                            sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' index.html"
-                            sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' about.html"
-                            sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' contact.html"
-                            sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' service.html"
-                        } else if (env.BRANCH_NAME == 'prod') {
-                            sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' index.html"
-                            sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' about.html"
-                            sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' contact.html"
-                            sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' service.html"
-                        }
-                        else {
-                            echo "Branch name not found"
-                        }
+                    if (env.BRANCH_NAME == 'dev') {
+                        echo "Changing URL for dev branch"
+                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' gassikialaw/index.html"
+                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' gassikialaw/about.html"
+                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' gassikialaw/contact.html"
+                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' gassikialaw/service.html"
+
+                        sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' gassikialaw/index.html"
+                        sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' gassikialaw/about.html"
+                        sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' gassikialaw/contact.html"
+                        sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' gassikialaw/service.html"
+                    } 
+                    // else if (env.BRANCH_NAME == 'prod') {
+                    //     echo "Changing URL for prod branch"
+                    //     sh "sed -i 's|https://dev.gassikialaw.com|https://gassikialaw.com|g' gassikialaw/index.html"
+                    //     sh "sed -i 's|https://dev.gassikialaw.com|https://gassikialaw.com|g' gassikialaw/about.html"
+                    //     sh "sed -i 's|https://dev.gassikialaw.com|https://gassikialaw.com|g' gassikialaw/contact.html"
+                    //     sh "sed -i 's|https://dev.gassikialaw.com|https://gassikialaw.com|g' gassikialaw/service.html"
+
+                    //     sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' gassikialaw/index.html"
+                    //     sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' gassikialaw/about.html"
+                    //     sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' gassikialaw/contact.html"
+                    //     sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' gassikialaw/service.html"
+                    // }
+                    else {
+                        echo "Branch name not found"
                     }
                 }
             }
