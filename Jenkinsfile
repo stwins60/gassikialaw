@@ -26,7 +26,7 @@ pipeline {
         }
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/stwins60/gassikialaw.git'
+                checkout([$class: 'GitSCM', branches: [[name: '*/dev'], [name: '*/prod']], userRemoteConfigs: [[url: 'https://github.com/stwins60/gassikialaw.git']]])
             }
         }
         stage('Sonarqube Analysis') {
@@ -47,14 +47,7 @@ pipeline {
                 }
             }
         }
-        // stage('Pytest') {
-        //     steps {
-        //         script {
-        //             sh "pip install -r requirements.txt --no-cache-dir"
-        //             sh "python3 -m pytest --cov=app --cov-report=xml --cov-report=html"
-        //         }
-        //     }
-        // }
+
         stage('OWASP') {
             steps {
                 dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey 4bdf4acc-8eae-45c1-bfc4-844d549be812', odcInstallation: 'DP-Check'
@@ -72,6 +65,39 @@ pipeline {
             steps {
                 sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
                 echo "Login Successful"
+            }
+        }
+        stage('Change Page URL for French') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'dev') {
+                        echo "Changing URL for dev branch"
+                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' gassikialaw/templates/index.html"
+                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' gassikialaw/templates/about.html"
+                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' gassikialaw/templates/contact.html"
+                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' gassikialaw/templates/service.html"
+
+                        sh "sed -i 's|https://fr.gassikialaw.com|https://fr-dev.gassikialaw.com|g' gassikialaw/templates/index.html"
+                        sh "sed -i 's|https://fr.gassikialaw.com|https://fr-dev.gassikialaw.com|g' gassikialaw/templates/about.html"
+                        sh "sed -i 's|https://fr.gassikialaw.com|https://fr-dev.gassikialaw.com|g' gassikialaw/templates/contact.html"
+                        sh "sed -i 's|https://fr.gassikialaw.com|https://fr-dev.gassikialaw.com|g' gassikialaw/templates/service.html"
+                    } 
+                    // else if (env.BRANCH_NAME == 'prod') {
+                    //     echo "Changing URL for prod branch"
+                    //     sh "sed -i 's|https://dev.gassikialaw.com|https://gassikialaw.com|g' gassikialaw/index.html"
+                    //     sh "sed -i 's|https://dev.gassikialaw.com|https://gassikialaw.com|g' gassikialaw/about.html"
+                    //     sh "sed -i 's|https://dev.gassikialaw.com|https://gassikialaw.com|g' gassikialaw/contact.html"
+                    //     sh "sed -i 's|https://dev.gassikialaw.com|https://gassikialaw.com|g' gassikialaw/service.html"
+
+                    //     sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' gassikialaw/index.html"
+                    //     sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' gassikialaw/about.html"
+                    //     sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' gassikialaw/contact.html"
+                    //     sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' gassikialaw/service.html"
+                    // }
+                    else {
+                        echo "Branch name not found"
+                    }
+                }
             }
         }
         stage("Docker Build") {
@@ -110,31 +136,22 @@ pipeline {
                     dir('./k8s') {
                         withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'fff8a37d-0976-4787-a985-a82f34d8db40', namespace: '', serverUrl: '']]) {
                             try {
-                                // Replace placeholders in deployment YAML files
-                                sh "sed -i 's|IMAGE_NAME|${env.EN_IMAGE_NAME}|g' en/deployment.yaml"
-                                sh "sed -i 's|IMAGE_NAME|${env.FR_IMAGE_NAME}|g' fr/deployment.yaml"
-
-                                // Apply Kubernetes configurations
-                                sh "kubectl apply -f fr/ -f en/"
-
-                                sh "kubectl rollout restart deployment $FR_DEPLOYMENT_NAME-deployment -n $NAMESPACE"
-                                sh "kubectl rollout restart deployment $EN_DEPLOYMENT_NAME-deployment -n $NAMESPACE"
-
-                                // Send success messages to Slack
-                                slackSend channel: '#alerts', color: 'good', message: "FR Deployment to Kubernetes was successful and currently running on https://fr.gassikialaw.com/"
-                                slackSend channel: '#alerts', color: 'good', message: "EN Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/"
+                                if (env.BRANCH_NAME == 'dev') {
+                                    echo "Deploying to dev"
+                                    sh "sed -i 's|IMAGE_TAG|${env.IMAGE_TAG}|g' overlays/dev/kustomization.yaml"
+                                    sh "kubectl apply -k overlays/dev"
+                                    slackSend channel: '#alerts', color: 'good', message: "Deployment to Kubernetes was successful and currently running on https://dev.gassikialaw.com/ & https://fr.dev.gassikialaw.com/"
+                                }
+                                else if (env.BRANCH_NAME == 'prod') {
+                                    echo "Deploying to prod"
+                                    sh "sed -i 's|IMAGE_TAG|${env.IMAGE_TAG}|g' overlays/prod/kustomization.yaml"
+                                    sh "kubectl apply -k overlays/prod"
+                                    slackSend channel: '#alerts', color: 'good', message: "Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/ & https://fr.gassikialaw.com/"
+                                }
+                                else {
+                                    slackSend channel: '#alerts', color: 'danger', message: "Deployment failed. Branch name not found"
+                                }
                                 
-                                // Check rollout status for both deployments
-                                // def frRolloutStatus = sh(script: "kubectl rollout status $FR_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
-                                // def enRolloutStatus = sh(script: "kubectl rollout status $EN_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
-
-                                // Handle rollout statuses
-                                // if (frRolloutStatus != 0) {
-                                //     slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw French site Deployment to Kubernetes failed"
-                                // }
-                                // if (enRolloutStatus != 0) {
-                                //     slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw English site Deployment to Kubernetes failed"
-                                // }
 
                             } catch (Exception e) {
                                 // Send failure message to Slack in case of any exception
