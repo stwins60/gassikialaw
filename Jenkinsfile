@@ -82,10 +82,10 @@ pipeline {
                         sh "sed -i 's|https://fr.gassikialaw.com|https://fr-dev.gassikialaw.com|g' gassikialaw/templates/contact.html"
                         sh "sed -i 's|https://fr.gassikialaw.com|https://fr-dev.gassikialaw.com|g' gassikialaw/templates/service.html"
 
-                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' fr_gassikialaw/templates/fr_index.html"
-                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' fr_gassikialaw/templates/fr_about.html"
-                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' fr_gassikialaw/templates/fr_contact.html"
-                        sh "sed -i 's|https://gassikialaw.com|https://dev.gassikialaw.com|g' fr_gassikialaw/templates/fr_service.html"
+                        sh "sed -i 's|https://gassikialaw.com/|https://dev.gassikialaw.com|g' fr_gassikialaw/templates/fr_index.html"
+                        sh "sed -i 's|https://gassikialaw.com/|https://dev.gassikialaw.com|g' fr_gassikialaw/templates/fr_about.html"
+                        sh "sed -i 's|https://gassikialaw.com/|https://dev.gassikialaw.com|g' fr_gassikialaw/templates/fr_contact.html"
+                        sh "sed -i 's|https://gassikialaw.com/|https://dev.gassikialaw.com|g' fr_gassikialaw/templates/fr_service.html"
                     } 
                     // else if (env.BRANCH_NAME == 'prod') {
                     //     echo "Changing URL for prod branch"
