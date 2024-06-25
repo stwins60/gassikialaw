@@ -5,7 +5,7 @@ metadata:
   namespace: gassikialaw
 spec:
   selector:
-    app: gassikialaw-en
+    app: gassikialaw-fr
   ports:
   - port: 5000
     targetPort: 5000
