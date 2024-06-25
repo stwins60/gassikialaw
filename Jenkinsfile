@@ -67,6 +67,27 @@ pipeline {
                 echo "Login Successful"
             }
         }
+        stage('Change Page URL for French') {
+            steps {
+                script {
+                    dir('./templates') {
+                        if (env.BRANCH_NAME == 'dev') {
+                            sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' index.html"
+                            sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' about.html"
+                            sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' contact.html"
+                            sh "sed -i 's|https://fr.gassikialaw.com|https://fr.dev.gassikialaw.com|g' service.html"
+                        } else if (env.BRANCH_NAME == 'prod') {
+                            sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' index.html"
+                            sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' about.html"
+                            sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' contact.html"
+                            sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' service.html"
+                        else {
+                            echo "Branch name not found"
+                        }
+                    }
+                }
+            }
+        }
         stage("Docker Build") {
             steps {
                 script {
