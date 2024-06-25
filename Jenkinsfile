@@ -119,7 +119,7 @@ pipeline {
                                     sh "sed -i '/IMAGE_TAG/${env.IMAGE_TAG}/g' overlays/prod/kustomization.yaml"
                                     sh "kubectl apply -k overlays/prod"
                                     slackSend channel: '#alerts', color: 'good', message: "Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/ & https://fr.gassikialaw.com/"
-                                }Send channel: '#alerts', color: 'good', message: "EN Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/"
+                                }
                                 
 
                             } catch (Exception e) {
