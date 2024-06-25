@@ -26,7 +26,7 @@ pipeline {
         }
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/stwins60/gassikialaw.git'
+                checkout([$class: 'GitSCM', branches: [[name: '*/dev'], [name: '*/prod']], userRemoteConfigs: [[url: 'https://github.com/stwins60/gassikialaw.git']]])
             }
         }
         stage('Sonarqube Analysis') {
@@ -110,31 +110,17 @@ pipeline {
                     dir('./k8s') {
                         withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'fff8a37d-0976-4787-a985-a82f34d8db40', namespace: '', serverUrl: '']]) {
                             try {
-                                // Replace placeholders in deployment YAML files
-                                sh "sed -i 's|IMAGE_NAME|${env.EN_IMAGE_NAME}|g' en/deployment.yaml"
-                                sh "sed -i 's|IMAGE_NAME|${env.FR_IMAGE_NAME}|g' fr/deployment.yaml"
-
-                                // Apply Kubernetes configurations
-                                sh "kubectl apply -f fr/ -f en/"
-
-                                sh "kubectl rollout restart deployment $FR_DEPLOYMENT_NAME-deployment -n $NAMESPACE"
-                                sh "kubectl rollout restart deployment $EN_DEPLOYMENT_NAME-deployment -n $NAMESPACE"
-
-                                // Send success messages to Slack
-                                slackSend channel: '#alerts', color: 'good', message: "FR Deployment to Kubernetes was successful and currently running on https://fr.gassikialaw.com/"
-                                slackSend channel: '#alerts', color: 'good', message: "EN Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/"
+                                if (env.BRANCH_NAME == 'dev') {
+                                    sh "sed -i '/IMAGE_TAG/${env.IMAGE_TAG}/g' overlays/dev/kustomization.yaml"
+                                    sh "kubectl apply -k overlays/dev"
+                                    slackSend channel: '#alerts', color: 'good', message: "Deployment to Kubernetes was successful and currently running on https://dev.gassikialaw.com/ & https://fr.dev.gassikialaw.com/"
+                                }
+                                if (env.BRANCH_NAME == 'prod') {
+                                    sh "sed -i '/IMAGE_TAG/${env.IMAGE_TAG}/g' overlays/prod/kustomization.yaml"
+                                    sh "kubectl apply -k overlays/prod"
+                                    slackSend channel: '#alerts', color: 'good', message: "Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/ & https://fr.gassikialaw.com/"
+                                }Send channel: '#alerts', color: 'good', message: "EN Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/"
                                 
-                                // Check rollout status for both deployments
-                                // def frRolloutStatus = sh(script: "kubectl rollout status $FR_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
-                                // def enRolloutStatus = sh(script: "kubectl rollout status $EN_DEPLOYMENT_NAME -n $NAMESPACE", returnStatus: true)
-
-                                // Handle rollout statuses
-                                // if (frRolloutStatus != 0) {
-                                //     slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw French site Deployment to Kubernetes failed"
-                                // }
-                                // if (enRolloutStatus != 0) {
-                                //     slackSend channel: '#alerts', color: 'danger', message: "Gassikialaw English site Deployment to Kubernetes failed"
-                                // }
 
                             } catch (Exception e) {
                                 // Send failure message to Slack in case of any exception

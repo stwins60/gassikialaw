@@ -23,7 +23,7 @@ spec:
                       - k8s
       containers:
       - name: gassikialaw-fr
-        image: IMAGE_NAME
+        image: idrisniyi94/gassikialaw-fr:latest
         resources:
           limits:
             memory: "128Mi"
