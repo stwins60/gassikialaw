@@ -105,7 +105,7 @@ pipeline {
                             try {
                                 if (env.BRANCH_NAME == 'dev') {
                                     echo "Deploying to dev"
-                                    sh "sed -i '|IMAGE_TAG|${env.IMAGE_TAG}|g' overlays/dev/kustomization.yaml"
+                                    sh "sed -i 's|IMAGE_TAG|${env.IMAGE_TAG}|g' overlays/dev/kustomization.yaml"
                                     sh "kubectl apply -k overlays/dev"
                                     slackSend channel: '#alerts', color: 'good', message: "Deployment to Kubernetes was successful and currently running on https://dev.gassikialaw.com/ & https://fr.dev.gassikialaw.com/"
                                 }
