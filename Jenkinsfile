@@ -81,6 +81,7 @@ pipeline {
                             sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' about.html"
                             sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' contact.html"
                             sh "sed -i 's|https://fr.dev.gassikialaw.com|https://fr.gassikialaw.com|g' service.html"
+                        }
                         else {
                             echo "Branch name not found"
                         }
