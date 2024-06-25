@@ -104,11 +104,13 @@ pipeline {
                         withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'fff8a37d-0976-4787-a985-a82f34d8db40', namespace: '', serverUrl: '']]) {
                             try {
                                 if (env.BRANCH_NAME == 'dev') {
+                                    echo "Deploying to dev"
                                     sh "sed -i '/IMAGE_TAG/${env.IMAGE_TAG}/g' overlays/dev/kustomization.yaml"
                                     sh "kubectl apply -k overlays/dev"
                                     slackSend channel: '#alerts', color: 'good', message: "Deployment to Kubernetes was successful and currently running on https://dev.gassikialaw.com/ & https://fr.dev.gassikialaw.com/"
                                 }
                                 if (env.BRANCH_NAME == 'prod') {
+                                    echo "Deploying to prod"
                                     sh "sed -i '/IMAGE_TAG/${env.IMAGE_TAG}/g' overlays/prod/kustomization.yaml"
                                     sh "kubectl apply -k overlays/prod"
                                     slackSend channel: '#alerts', color: 'good', message: "Deployment to Kubernetes was successful and currently running on https://gassikialaw.com/ & https://fr.gassikialaw.com/"
