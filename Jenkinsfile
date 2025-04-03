@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('62690e9e-f88b-462b-9cce-f18f9ebccfd4')
-        SCANNER_HOME= tool 'sonar-scanner'
+        // SCANNER_HOME= tool 'sonar-scanner'
         DOCKERHUB_USERNAME = 'idrisniyi94'
         FR_DEPLOYMENT_NAME = 'gassikialaw-fr'
         EN_DEPLOYMENT_NAME = 'gassikialaw-en'
