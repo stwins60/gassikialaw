@@ -168,13 +168,13 @@
     <div class="container-fluid py-5">
         <div class="container py-5">
             <div class="row">
-                <div class="col-lg-3">
+                <!-- <div class="col-lg-3">
                     <h6 class="text-uppercase">Our Practice</h6>
                     <h1 class="mb-4">Our Practice Areas</h1>
                     <p>At Gassikia Law Firm, we are dedicated to helping families stay together through our family-based immigration law services</p>
                     <a href="" class="btn btn-primary mt-2">More Services</a>
-                </div>
-                <div class="col-lg-9 pt-5 pt-lg-0">
+                </div> -->
+                <div class="col-lg-12 pt-5 pt-lg-5">
                     <div class="bg-primary rounded" style="height: 200px;"></div>
                     <div class="owl-carousel service-carousel position-relative" style="margin-top: -100px; padding: 0 30px;">
                         <div class="d-flex flex-column align-items-center text-center bg-white rounded pt-4">
@@ -228,7 +228,7 @@
                     <div class="col-lg-6 py-5">
                         <div class="rounded p-5 my-5" style="background: rgba(55, 55, 63, .7);">
                             <h1 class="text-center text-white mb-4">Get An Appointment</h1>
-                            <form action="{{ url_for('getAppointments') }}" method="post">
+                            <!-- <form action="{{ url_for('getAppointments') }}" method="post">
                                 <div class="form-group">
                                     <input type="text" class="form-control border-0 p-4" name="fullName" id="fullName" placeholder="Your Name" required="required" />
                                 </div>
@@ -255,21 +255,24 @@
                                     <select class="custom-select border-0 px-4" name="services" id="services" style="height: 47px;">
                                         {% for service in services %}
                                             <option {% if service == services[4] %}selected{% endif %} value="{{ service }}">{{ service }}</option>
-                                        {% endfor %}
+                                        {% endfor %} -->
                                         <!-- <option selected>Select A Service</option>
                                         <option value="1">Service 1</option>
                                         <option value="2">Service 1</option>
                                         <option value="3">Service 1</option> -->
-                                    </select>
-                                </div>
-                                <div>
-                                    <button class="btn btn-primary btn-block border-0 py-3" type="submit">Get An Appointment</button>
-                                </div>
-                            </form>
+                                    <!-- </select>
+                                </div> -->
+                                
+                            <!-- </form> -->
+                            <div>
+                                <a href="https://calendly.com/gassikialaw/general-consultation-1" target="_blank" class="btn btn-primary btn-block border-0 py-3" role="button">
+                                    Book Consultation
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="alert">
+                <!-- <div class="alert">
                     {% for message in get_flashed_messages() %}
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             <strong>Success!</strong> {{ message }}
@@ -278,7 +281,7 @@
                             </button>
                         </div>
                     {% endfor %}
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
