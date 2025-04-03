@@ -14,22 +14,22 @@ app.secret_key = token
 # app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 CORS(app)
 
-sentry_sdk.init(
-    dsn="https://7a8ff1273de0318966f247225d3bad22@sentry.africantech.dev/3",
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    enable_tracing=True,
-    traces_sample_rate=1.0,
-    profiles_sample_rate=1.0,
-    integrations = [
-        FlaskIntegration(
-            transaction_style="url"
-        ),
-        AioHttpIntegration(
-            transaction_style="method_and_path_pattern"
-        )
-    ]
-)
+# sentry_sdk.init(
+#     dsn="https://7a8ff1273de0318966f247225d3bad22@sentry.africantech.dev/3",
+#     # Set traces_sample_rate to 1.0 to capture 100%
+#     # of transactions for performance monitoring.
+#     enable_tracing=True,
+#     traces_sample_rate=1.0,
+#     profiles_sample_rate=1.0,
+#     integrations = [
+#         FlaskIntegration(
+#             transaction_style="url"
+#         ),
+#         AioHttpIntegration(
+#             transaction_style="method_and_path_pattern"
+#         )
+#     ]
+# )
 # @babel.request_loader
 # def get_locale():
 #     return 'fr'
@@ -187,6 +187,6 @@ def contactUs():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
 
 
